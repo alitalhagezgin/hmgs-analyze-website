@@ -1,4 +1,4 @@
-import html2canvas from 'html2canvas';
+import html2canvas from 'html2canvas-pro';
 
 function todayStr() {
   return new Date().toISOString().slice(0, 10);

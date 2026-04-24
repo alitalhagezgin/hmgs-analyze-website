@@ -1,5 +1,11 @@
 import { TOPICS } from '../data/topics';
 
+const TOTAL = 120;
+
+function round2(n) {
+  return Math.round(n * 100) / 100;
+}
+
 export function computeAnalytics(questions) {
   const total       = questions.length;
   const correct     = questions.filter(q => q.status === 'correct').length;
@@ -10,16 +16,15 @@ export function computeAnalytics(questions) {
   const blank       = questions.filter(q => q.status === 'blank').length;
   const unanswered  = questions.filter(q => q.status === null).length;
 
-  // Minimum net: yalnızca kesin doğru/yanlış (kararsızlar dahil değil)
-  const minNet = correct - wrong / 4;
+  // Minimum puan: yalnızca kesin doğrular (yanlış puana etki etmez)
+  const minimumScore = (correct / TOTAL) * 100;
 
-  // Tahmini net: kararsızları olasılıkla dahil et
-  // near_correct → %70 doğru, %30 yanlış
-  // near_wrong   → %30 doğru, %70 yanlış
-  // forgot + blank → nete etki etmez
+  // Tahmini puan: kararsızları olasılıkla dahil et
+  // near_correct → %70 ihtimalle doğru
+  // near_wrong   → %30 ihtimalle doğru
+  // wrong / forgot / blank → puana etki etmez
   const estimatedCorrect = correct + nearCorrect * 0.7 + nearWrong * 0.3;
-  const estimatedWrong   = wrong   + nearCorrect * 0.3 + nearWrong * 0.7;
-  const estimatedNet     = estimatedCorrect - estimatedWrong / 4;
+  const estimatedScore   = (estimatedCorrect / TOTAL) * 100;
 
   const byTopic = TOPICS.map(topicName => {
     const topicQs      = questions.filter(q => q.topic === topicName);
@@ -56,8 +61,8 @@ export function computeAnalytics(questions) {
     forgot,
     blank,
     unanswered,
-    minNet:        Math.round(minNet * 100) / 100,
-    estimatedNet:  Math.round(estimatedNet * 100) / 100,
+    minimumScore:  round2(minimumScore),
+    estimatedScore: round2(estimatedScore),
     byTopic,
     unassignedCount,
   };

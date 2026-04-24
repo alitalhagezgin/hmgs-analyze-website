@@ -8,7 +8,7 @@ import { computeAnalytics } from '../utils/analytics';
 import { exportToPDF, exportToPNG } from '../utils/exportHelpers';
 import StatCard from './StatCard';
 import TopicCard from './TopicCard';
-import NetExplanation from './NetExplanation';
+import ScoreExplanation from './ScoreExplanation';
 import { TOTAL_QUESTIONS } from '../data/topics';
 
 const PIE_COLORS = ['#22c55e', '#ef4444', '#f59e0b', '#94a3b8', '#6b7280', '#cbd5e1'];
@@ -141,7 +141,7 @@ export default function AnalysisView({ questions, onBack, theme }) {
               <StatCard
                 label="Boş"
                 value={stats.blank}
-                sub="Nete etki etmez"
+                sub="Puana etki etmez"
                 colorClass="text-slate-600 dark:text-slate-400"
                 bgClass="bg-slate-100 dark:bg-slate-800"
                 icon={<Circle size={14} className="text-slate-400" />}
@@ -155,18 +155,18 @@ export default function AnalysisView({ questions, onBack, theme }) {
                 icon={<HelpCircle size={14} className="text-amber-500" />}
               />
               <StatCard
-                label="Tahmini Net"
-                value={stats.estimatedNet.toFixed(2)}
-                sub={`Min: ${stats.minNet.toFixed(2)}`}
-                colorClass={stats.estimatedNet >= 0 ? 'text-indigo-700 dark:text-indigo-400' : 'text-red-600 dark:text-red-400'}
+                label="Tahmini Puan"
+                value={stats.estimatedScore.toFixed(2)}
+                sub={`Min: ${stats.minimumScore.toFixed(2)}`}
+                colorClass="text-indigo-700 dark:text-indigo-400"
                 bgClass="bg-indigo-50 dark:bg-indigo-900/20"
                 icon={<Target size={14} className="text-indigo-500" />}
               />
             </div>
           </section>
 
-          {/* Net açıklama kutusu */}
-          <NetExplanation minNet={stats.minNet} estimatedNet={stats.estimatedNet} />
+          {/* Puan açıklama kutusu */}
+          <ScoreExplanation minimumScore={stats.minimumScore} estimatedScore={stats.estimatedScore} />
 
           {/* Grafikler */}
           <section className="grid md:grid-cols-2 gap-6">
