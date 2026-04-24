@@ -6,6 +6,7 @@ import {
 import { ArrowLeft, TrendingUp, TrendingDown, Minus, FileText, Image, Loader2 } from 'lucide-react';
 import { exportToPDF, exportToPNG } from '../utils/exportHelpers';
 import { TOPICS } from '../data/topics';
+import PrintableComparison from './PrintableComparison';
 
 // Puan 0-100 arasında renk
 const BAR_COLORS = ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6'];
@@ -21,7 +22,8 @@ function TrendIcon({ diff }) {
 }
 
 export default function ExamComparisonView({ exams, onBack, theme }) {
-  const contentRef = useRef(null);
+  const contentRef    = useRef(null);
+  const printableRef  = useRef(null);
   const [exporting, setExporting] = useState(null);
 
   const isDark    = theme === 'dark';
@@ -61,8 +63,8 @@ export default function ExamComparisonView({ exams, onBack, theme }) {
     setExporting(type);
     try {
       const today = new Date().toISOString().slice(0, 10);
-      if (type === 'pdf') await exportToPDF(contentRef, `HMGS-Karşılaştırma-${today}.pdf`);
-      else                await exportToPNG(contentRef, `HMGS-Karşılaştırma-${today}.png`);
+      if (type === 'pdf') await exportToPDF(printableRef, `HMGS-Karsilastirma-${today}.pdf`);
+      else                await exportToPNG(printableRef, `HMGS-Karsilastirma-${today}.png`);
     } finally {
       setExporting(null);
     }
@@ -239,6 +241,11 @@ export default function ExamComparisonView({ exams, onBack, theme }) {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Ekran dışı — sadece export hedefi */}
+      <div style={{ position: 'absolute', left: '-9999px', top: 0, pointerEvents: 'none' }}>
+        <PrintableComparison ref={printableRef} exams={exams} />
       </div>
     </div>
   );

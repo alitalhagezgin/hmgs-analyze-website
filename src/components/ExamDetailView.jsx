@@ -3,6 +3,7 @@ import { ArrowLeft, FileText, Image, Loader2, Upload, AlertTriangle } from 'luci
 import { computeAnalytics } from '../utils/analytics';
 import { exportToPDF, exportToPNG } from '../utils/exportHelpers';
 import AnalysisContent from './AnalysisContent';
+import PrintableAnalysis from './PrintableAnalysis';
 
 function formatDate(iso) {
   return new Intl.DateTimeFormat('tr-TR', {
@@ -12,8 +13,9 @@ function formatDate(iso) {
 }
 
 export default function ExamDetailView({ exam, onBack, theme, onLoadExam }) {
-  const stats      = computeAnalytics(exam.questions);
-  const contentRef = useRef(null);
+  const stats        = computeAnalytics(exam.questions);
+  const contentRef   = useRef(null);  // ekranda görünen
+  const printableRef = useRef(null);  // export hedefi
 
   const [exporting, setExporting]       = useState(null);
   const [showLoadConfirm, setShowLoadConfirm] = useState(false);
@@ -22,8 +24,8 @@ export default function ExamDetailView({ exam, onBack, theme, onLoadExam }) {
     setExporting(type);
     try {
       const slug = exam.name.replace(/\s+/g, '-');
-      if (type === 'pdf') await exportToPDF(contentRef, `HMGS-${slug}.pdf`);
-      else                await exportToPNG(contentRef, `HMGS-${slug}.png`);
+      if (type === 'pdf') await exportToPDF(printableRef, `HMGS-${slug}.pdf`);
+      else                await exportToPNG(printableRef, `HMGS-${slug}.png`);
     } finally {
       setExporting(null);
     }
@@ -89,6 +91,11 @@ export default function ExamDetailView({ exam, onBack, theme, onLoadExam }) {
       </div>
 
       <AnalysisContent stats={stats} theme={theme} contentRef={contentRef} />
+
+      {/* Ekran dışı — sadece export hedefi */}
+      <div style={{ position: 'absolute', left: '-9999px', top: 0, pointerEvents: 'none' }}>
+        <PrintableAnalysis ref={printableRef} stats={stats} examName={exam.name} />
+      </div>
 
       {/* Yükleme onay modal */}
       {showLoadConfirm && (

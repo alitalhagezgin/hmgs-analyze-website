@@ -4,10 +4,12 @@ import { computeAnalytics } from '../utils/analytics';
 import { exportToPDF, exportToPNG } from '../utils/exportHelpers';
 import AnalysisContent from './AnalysisContent';
 import SaveExamModal from './SaveExamModal';
+import PrintableAnalysis from './PrintableAnalysis';
 
 export default function AnalysisView({ questions, onBack, theme, onSave, savedExams = [] }) {
-  const stats      = computeAnalytics(questions);
-  const contentRef = useRef(null);
+  const stats        = computeAnalytics(questions);
+  const contentRef   = useRef(null);  // ekrana render olan içerik
+  const printableRef = useRef(null);  // export hedefi (hidden, inline-style)
 
   const [exporting, setExporting]       = useState(null); // 'pdf' | 'png' | null
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -19,8 +21,8 @@ export default function AnalysisView({ questions, onBack, theme, onSave, savedEx
     setExporting(type);
     try {
       const today = new Date().toISOString().slice(0, 10);
-      if (type === 'pdf') await exportToPDF(contentRef, `HMGS-Analiz-${today}.pdf`);
-      else                await exportToPNG(contentRef, `HMGS-Analiz-${today}.png`);
+      if (type === 'pdf') await exportToPDF(printableRef, `HMGS-Analiz-${today}.pdf`);
+      else                await exportToPNG(printableRef, `HMGS-Analiz-${today}.png`);
     } finally {
       setExporting(null);
     }
@@ -92,6 +94,11 @@ export default function AnalysisView({ questions, onBack, theme, onSave, savedEx
       </div>
 
       <AnalysisContent stats={stats} theme={theme} contentRef={contentRef} />
+
+      {/* Ekran dışı — sadece export hedefi, Tailwind'e bağımlı değil */}
+      <div style={{ position: 'absolute', left: '-9999px', top: 0, pointerEvents: 'none' }}>
+        <PrintableAnalysis ref={printableRef} stats={stats} examName={null} />
+      </div>
 
       {showSaveModal && (
         <SaveExamModal

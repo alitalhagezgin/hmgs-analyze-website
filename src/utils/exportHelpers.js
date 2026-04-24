@@ -4,7 +4,9 @@ function todayStr() {
   return new Date().toISOString().slice(0, 10);
 }
 
-// Dark mode'u geçici olarak kaldırıp, export sonrası geri yükler
+// Dark mode'u geçici olarak kaldırıp export sonrası geri yükler.
+// PrintableAnalysis/PrintableComparison zaten white background kullanıyor
+// ama diğer yerlerden çağrılırsa güvenlik için bırakıyoruz.
 async function withLightMode(fn) {
   const root = document.documentElement;
   const wasDark = root.classList.contains('dark');
@@ -16,46 +18,22 @@ async function withLightMode(fn) {
   }
 }
 
-// Mobilde desktop genişliğini simüle ederek canvas alır
+// Ekran dışı (left: -9999px) konumlandırılmış bir elementi yakalar.
+// Hedef element inline-style ile 1200px genişlik tanımladığından
+// mobil/desktop farkı yoktur.
 async function captureElement(element) {
-  const isMobile = window.innerWidth < 1024;
+  // Element'in tam boyutlarının browser tarafından hesaplanması için kısa bekleme
+  await new Promise(resolve => setTimeout(resolve, 150));
 
-  const originalStyles = {
-    width:    element.style.width,
-    minWidth: element.style.minWidth,
-    maxWidth: element.style.maxWidth,
-  };
-
-  if (isMobile) {
-    element.style.width    = '1280px';
-    element.style.minWidth = '1280px';
-    element.style.maxWidth = '1280px';
-    // Recharts ResponsiveContainer'ın yeni boyutu algılayıp yeniden render etmesi için bekle
-    await new Promise(resolve => setTimeout(resolve, 500));
-  } else {
-    // Grafiklerin render tamamlanması için kısa bekleme
-    await new Promise(resolve => setTimeout(resolve, 300));
-  }
-
-  try {
-    return await html2canvas(element, {
-      scale:         2,
-      useCORS:       true,
-      allowTaint:    true,
-      backgroundColor: '#f8fafc',
-      logging:       false,
-      windowWidth:   isMobile ? 1280 : element.scrollWidth,
-      windowHeight:  element.scrollHeight,
-      width:         isMobile ? 1280 : element.scrollWidth,
-      height:        element.scrollHeight,
-      scrollX:       0,
-      scrollY:       0,
-    });
-  } finally {
-    element.style.width    = originalStyles.width;
-    element.style.minWidth = originalStyles.minWidth;
-    element.style.maxWidth = originalStyles.maxWidth;
-  }
+  return html2canvas(element, {
+    scale:           2,
+    useCORS:         true,
+    allowTaint:      true,
+    backgroundColor: '#ffffff',
+    logging:         false,
+    scrollX:         0,
+    scrollY:         0,
+  });
 }
 
 export async function exportToPNG(ref, filename = `HMGS-Analiz-${todayStr()}.png`) {
