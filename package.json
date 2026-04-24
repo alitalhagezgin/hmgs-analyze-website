@@ -1,14 +1,21 @@
 {
   "name": "hmgs-web",
   "version": "1.0.0",
-  "description": "",
+  "description": "HMGS soru performansi ve konu bazli analiz uygulamasi",
   "main": "index.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
-  "keywords": [],
+  "keywords": [
+    "hmgs",
+    "hukuk",
+    "sinav",
+    "react",
+    "vite",
+    "analysis"
+  ],
   "author": "",
   "license": "ISC",
   "type": "module",
