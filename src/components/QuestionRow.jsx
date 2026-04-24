@@ -44,8 +44,8 @@ export default function QuestionRow({ question, onStatusChange, onTopicChange, i
         Soru {questionNumber}
       </span>
 
-      {/* Durum butonları */}
-      <div className="flex flex-wrap gap-1.5 flex-1">
+      {/* Durum butonları — mobilde 2×3 grid, sm+ flex */}
+      <div className="grid grid-cols-3 gap-1.5 sm:flex sm:flex-wrap sm:gap-1.5 flex-1">
         {STATUSES.map(s => {
           const isSelected = status === s.key;
           const styles = STATUS_STYLES[s.key];
@@ -54,11 +54,14 @@ export default function QuestionRow({ question, onStatusChange, onTopicChange, i
               key={s.key}
               onClick={() => onStatusChange(questionNumber, isSelected ? null : s.key)}
               title={s.label}
-              className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all duration-150 ${
+              className={`flex items-center justify-center gap-1 px-2 py-2 sm:px-2.5 sm:py-1.5 text-xs font-semibold rounded-lg border transition-all duration-150 ${
                 isSelected ? styles.active : styles.inactive
               }`}
             >
-              {s.emoji} <span className="hidden sm:inline">{s.label}</span>
+              <span>{s.emoji}</span>
+              {/* sm 미만: shortLabel / md+: full label */}
+              <span className="md:hidden">{s.shortLabel}</span>
+              <span className="hidden md:inline">{s.label}</span>
             </button>
           );
         })}

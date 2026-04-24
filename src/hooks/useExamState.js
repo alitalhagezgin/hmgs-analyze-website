@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { TOTAL_QUESTIONS } from '../data/topics';
+import { TOTAL_QUESTIONS, getDefaultTopicForQuestion } from '../data/topics';
 
 const STORAGE_KEY = 'hmgs_exam_state';
 
@@ -7,7 +7,7 @@ function buildInitialQuestions() {
   return Array.from({ length: TOTAL_QUESTIONS }, (_, i) => ({
     questionNumber: i + 1,
     status: null,
-    topic: null,
+    topic: getDefaultTopicForQuestion(i + 1),
   }));
 }
 

@@ -12,6 +12,7 @@ import SavedExamsView from './components/SavedExamsView';
 import ExamDetailView from './components/ExamDetailView';
 import ExamComparisonView from './components/ExamComparisonView';
 import ThemeToggle from './components/ThemeToggle';
+import SplashScreen from './components/SplashScreen';
 
 // 'exam' | 'analysis' | 'saved' | 'detail' | 'comparison'
 const KEY_TO_STATUS = {
@@ -20,6 +21,16 @@ const KEY_TO_STATUS = {
 };
 
 export default function App() {
+  // sessionStorage ile aynı oturumda tekrar gösterilmez; yeni sekme = yeni oturum
+  const [showSplash, setShowSplash] = useState(
+    () => !sessionStorage.getItem('hmgs-splash-shown')
+  );
+
+  const handleSplashFinish = useCallback(() => {
+    sessionStorage.setItem('hmgs-splash-shown', 'true');
+    setShowSplash(false);
+  }, []);
+
   const { theme, toggleTheme } = useTheme();
   const { savedExams, saveExam, deleteExam, renameExam, getExamById } = useSavedExams();
   const {
@@ -91,6 +102,10 @@ export default function App() {
   }
 
   // ── Routing ──────────────────────────────────────────────
+
+  if (showSplash) {
+    return <SplashScreen onFinish={handleSplashFinish} />;
+  }
 
   if (view === 'analysis') {
     return (
