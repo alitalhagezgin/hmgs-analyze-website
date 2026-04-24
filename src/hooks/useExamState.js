@@ -21,76 +21,68 @@ function loadFromStorage() {
   }
 }
 
-function saveToStorage(state) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch {
-    // storage dolu olabilir, sessizce geç
-  }
-}
-
 export function useExamState() {
   const [questions, setQuestions] = useState(() => {
     const saved = loadFromStorage();
     return saved?.questions ?? buildInitialQuestions();
   });
-  const [startedAt] = useState(() => {
+
+  const [startedAt, setStartedAt] = useState(() => {
     const saved = loadFromStorage();
     return saved?.startedAt ?? new Date().toISOString();
   });
-  const [showAnalysis, setShowAnalysis] = useState(false);
 
-  // Her değişiklikte localStorage'a yaz
   useEffect(() => {
-    saveToStorage({ questions, startedAt });
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ questions, startedAt }));
+    } catch {}
   }, [questions, startedAt]);
 
   const setQuestionStatus = useCallback((questionNumber, status) => {
     setQuestions(prev =>
-      prev.map(q =>
-        q.questionNumber === questionNumber ? { ...q, status } : q
-      )
+      prev.map(q => q.questionNumber === questionNumber ? { ...q, status } : q)
     );
   }, []);
 
   const setQuestionTopic = useCallback((questionNumber, topic) => {
     setQuestions(prev =>
-      prev.map(q =>
-        q.questionNumber === questionNumber ? { ...q, topic } : q
-      )
+      prev.map(q => q.questionNumber === questionNumber ? { ...q, topic } : q)
     );
   }, []);
 
-  // Aralıktaki sorulara toplu konu atama
   const bulkAssignTopic = useCallback((from, to, topic) => {
     setQuestions(prev =>
       prev.map(q =>
-        q.questionNumber >= from && q.questionNumber <= to
-          ? { ...q, topic }
-          : q
+        q.questionNumber >= from && q.questionNumber <= to ? { ...q, topic } : q
       )
     );
   }, []);
 
   const resetExam = useCallback(() => {
     const fresh = buildInitialQuestions();
+    const now = new Date().toISOString();
     setQuestions(fresh);
-    setShowAnalysis(false);
+    setStartedAt(now);
     localStorage.removeItem(STORAGE_KEY);
   }, []);
 
+  // Kaydedilmiş bir sınavı aktif sınav olarak yükle
+  const loadExam = useCallback((savedQuestions) => {
+    setQuestions(savedQuestions);
+    setStartedAt(new Date().toISOString());
+  }, []);
+
   const answeredCount = questions.filter(q => q.status !== null).length;
-  const allAnswered = answeredCount === TOTAL_QUESTIONS;
+  const allAnswered   = answeredCount === TOTAL_QUESTIONS;
 
   return {
     questions,
     startedAt,
-    showAnalysis,
-    setShowAnalysis,
     setQuestionStatus,
     setQuestionTopic,
     bulkAssignTopic,
     resetExam,
+    loadExam,
     answeredCount,
     allAnswered,
   };
