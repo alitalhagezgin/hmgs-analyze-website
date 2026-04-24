@@ -10,6 +10,29 @@ import { TOTAL_QUESTIONS } from '../data/topics';
 
 const PIE_COLORS = ['#22c55e', '#ef4444', '#f59e0b', '#94a3b8', '#6b7280', '#cbd5e1'];
 
+const SHORT_NAMES = {
+  "Anayasa Hukuku":                  "Anayasa",
+  "Anayasa Yargısı":                 "Any. Yarg.",
+  "İdare Hukuku":                    "İdare",
+  "İdari Yargılama Usulü":           "İYUK",
+  "Medeni Hukuk":                    "Medeni",
+  "Borçlar Hukuku":                  "Borçlar",
+  "Ticaret Hukuku":                  "Ticaret",
+  "Hukuk Yargılama Usulü":           "HMK",
+  "İcra ve İflas Hukuku":            "İcra-İflas",
+  "Ceza Hukuku":                     "Ceza",
+  "Ceza Yargılama Usulü":            "CMK",
+  "İş ve Sosyal Güvenlik Hukuku":    "İş-SGK",
+  "Vergi Hukuku":                    "Vergi",
+  "Vergi Usul Hukuku":               "VUK",
+  "Avukatlık Hukuku":                "Avukatlık",
+  "Hukuk Felsefesi ve Sosyolojisi":  "Huk. Fel.",
+  "Türk Hukuk Tarihi":               "THT",
+  "Milletlerarası Hukuk":            "Devletler H.",
+  "Milletlerarası Özel Hukuk":       "MÖH",
+  "Genel Kamu Hukuku":               "Gen. Kamu",
+};
+
 export default function AnalysisContent({ stats, theme, contentRef }) {
   const isDark        = theme === 'dark';
   const chartText     = isDark ? '#94a3b8' : '#64748b';
@@ -26,7 +49,7 @@ export default function AnalysisContent({ stats, theme, contentRef }) {
   const barData = stats.byTopic
     .filter(t => t.total > 0)
     .map(t => ({
-      name:     t.topicName.split(' ').slice(0, 2).join(' '),
+      name:     SHORT_NAMES[t.topicName] ?? t.topicName,
       fullName: t.topicName,
       Doğru:    t.correct,
       Yanlış:   t.wrong,
@@ -107,13 +130,25 @@ export default function AnalysisContent({ stats, theme, contentRef }) {
             {barData.length === 0 ? (
               <p className="text-slate-400 dark:text-slate-500 text-sm text-center py-8">Hiç konu atanmamış</p>
             ) : (
-              <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={barData} margin={{ top: 4, right: 4, left: -20, bottom: 40 }}>
+              <ResponsiveContainer width="100%" height={380}>
+                <BarChart data={barData} margin={{ top: 4, right: 4, left: -20, bottom: 90 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={chartGrid} />
-                  <XAxis dataKey="name" tick={{ fontSize: 10, fill: chartText }} angle={-35} textAnchor="end" interval={0} />
+                  <XAxis
+                    dataKey="name"
+                    angle={-35}
+                    textAnchor="end"
+                    interval={0}
+                    height={80}
+                    tickMargin={8}
+                    tick={{ fontSize: 10, fill: chartText }}
+                  />
                   <YAxis tick={{ fontSize: 10, fill: chartText }} />
                   <Tooltip content={<CustomTooltip />} />
-                  <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8, color: chartText }} />
+                  <Legend
+                    verticalAlign="bottom"
+                    iconSize={12}
+                    wrapperStyle={{ fontSize: 12, paddingTop: 20, color: chartText }}
+                  />
                   <Bar dataKey="Doğru"  fill="#22c55e" radius={[3,3,0,0]} />
                   <Bar dataKey="Yanlış" fill="#ef4444" radius={[3,3,0,0]} />
                   <Bar dataKey="Diğer"  fill="#94a3b8" radius={[3,3,0,0]} />
