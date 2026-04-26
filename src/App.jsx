@@ -4,7 +4,7 @@ import { useExamState } from './hooks/useExamState';
 import { useTheme } from './hooks/useTheme';
 import { useSavedExams } from './hooks/useSavedExams';
 import { TOTAL_QUESTIONS } from './data/topics';
-import ProgressBar from './components/ProgressBar';
+import LiveStatsBar from './components/LiveStatsBar';
 import QuestionRow from './components/QuestionRow';
 import TopicSidebar from './components/TopicSidebar';
 import AnalysisView from './components/AnalysisView';
@@ -199,10 +199,16 @@ export default function App() {
         </div>
       </header>
 
+      {/* Canlı analiz barı — sticky, header kayınca yapışır */}
+      <div className="sticky top-0 z-10 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 shadow-sm transition-colors duration-200">
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          <LiveStatsBar questions={questions} />
+        </div>
+      </div>
+
       {/* Ana içerik */}
       <div className="flex-1 max-w-7xl mx-auto w-full px-4 py-4 flex gap-5">
         <main className="flex-1 min-w-0">
-          <ProgressBar answeredCount={answeredCount} />
           <div className="space-y-2">
             {questions.map((q, i) => (
               <QuestionRow
@@ -218,7 +224,7 @@ export default function App() {
         </main>
 
         <aside className="hidden lg:block w-72 shrink-0">
-          <div className="sticky top-4">
+          <div className="sticky top-24">
             <TopicSidebar questions={questions} onBulkAssign={bulkAssignTopic} />
           </div>
         </aside>
